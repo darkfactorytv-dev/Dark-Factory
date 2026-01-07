@@ -1,0 +1,54 @@
+﻿name: 🏭 Dark Factory Production
+
+on:
+  workflow_dispatch:    # Permite execução manual
+  push:                 # Executa em cada push
+    branches: [ main ]
+
+jobs:
+  simulate-production:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          
+      - name: 📦 Install dependencies
+        run: pip install -r requirements.txt
+        
+      - name: 🎬 Run Dark Factory Simulation
+        run: |
+          echo "========================================"
+          echo "🏭 DARK FACTORY - PRODUCTION SIMULATION"
+          echo "========================================"
+          echo "📅 Date: $(date)"
+          echo "📁 Repository: ${{ github.repository }}"
+          echo "🌿 Branch: ${{ github.ref_name }}"
+          echo ""
+          echo "📋 PRODUCTION STEPS:"
+          echo "1. 📝 Selecting theme..."
+          echo "2. 🎙️ Generating audio..."
+          echo "3. 🖼️ Creating thumbnail..."
+          echo "4. 🎬 Editing video..."
+          echo "5. 📤 Preparing upload..."
+          echo ""
+          echo "✅ SIMULATION COMPLETE!"
+          echo "========================================"
+          
+          # Create simulation log
+          echo "Simulation completed at: $(date)" > simulation.log
+          echo "Next: Configure Google APIs" >> simulation.log
+          
+      - name: 💾 Save simulation log
+        uses: actions/upload-artifact@v4
+        with:
+          name: simulation-logs
+          path: simulation.log
+          
+      - name: 🎉 Success
+        run: echo "🚀 Dark Factory workflow executed successfully!"
