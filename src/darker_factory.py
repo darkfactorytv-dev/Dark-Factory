@@ -12,7 +12,7 @@ import sys
 # ============================================
 # CREDENCIAIS EMBUTIDAS (Base64 encoded)
 # ============================================
-GEMINI_B64 = "QUl6YVN5Li4u"
+GEMINI_B64 = "QUl6YVN5QUFZay1BdzNZYnM5SFhfTURjWHYxNVM3TmJTMjdwekww"
 YOUTUBE_B64 = "eyJpbnN0YWxsZWQiOiB7ImNsaWVudF9pZCI6ICJ4eHgiLCAiY2xpZW50X3NlY3JldCI6ICJ4eHgiLCAiYXV0aF91cmkiOiAiaHR0cHM6Ly9hY2NvdW50cy5nb29nbGUuY29tL28vb2F1dGgyL2F1dGgiLCAidG9rZW5fdXJpIjogImh0dHBzOi8vb2F1dGgyLmdvb2dsZWFwaXMuY29tL3Rva2VuIiwgImF1dGhfcHJvdmlkZXJfeDUwOV9jZXJ0X3VybCI6ICJodHRwczovL3d3dy5nb29nbGVhcGlzLmNvbS9vYXV0aDIvdjEvY2VydHMiLCAicmVkaXJlY3RfdXJpcyI6IFsiaHR0cDovL2xvY2FsaG9zdCJdfX0="
 
 def decode_credentials():
@@ -73,3 +73,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+

@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/env python3
 """
 Dark Factory - Real Content Generator
-Generates actual YouTube content using Gemini API
+Uses NEW google-genai SDK (not google.generativeai)
 """
 import sys
 import os
@@ -12,7 +12,8 @@ from datetime import datetime
 sys.path.append(os.path.dirname(__file__))
 from darker_factory import decode_credentials
 
-import google.genai as genai
+# NEW: import from google.genai
+import google.genai
 
 def generate_youtube_script():
     """Generate a complete YouTube video script"""
@@ -27,11 +28,8 @@ def generate_youtube_script():
         return None
     
     try:
-        # Configure Gemini
-        genai.configure(api_key=gemini_key)
-        
-        # Use Gemini 2.0 Flash (fast and capable)
-        model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        # NEW API: Configure with client
+        client = google.genai.Client(api_key=gemini_key)
         
         # YouTube video topics for automation/tech niche
         topics = [
@@ -62,12 +60,19 @@ def generate_youtube_script():
         Make it engaging and suitable for an automated tech channel.
         """
         
-        response = model.generate_content(prompt)
+        # NEW API: Generate content
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt
+        )
         script = response.text
         
         # Generate title separately
         title_prompt = f"Generate a catchy YouTube title for a video about: {selected_topic}"
-        title_response = model.generate_content(title_prompt)
+        title_response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=title_prompt
+        )
         title = title_response.text.strip().replace('"', '')
         
         print(f"✅ Generated: '{title}'")
@@ -99,7 +104,7 @@ def generate_youtube_script():
             "topic": selected_topic,
             "generated_at": datetime.now().isoformat(),
             "script_length": len(script),
-            "model": "gemini-2.0-flash-exp"
+            "model": "gemini-2.0-flash"
         }
         
         with open(f"metadata_{timestamp}.json", "w", encoding="utf-8") as f:
@@ -118,6 +123,8 @@ def generate_youtube_script():
         
     except Exception as e:
         print(f"❌ Generation error: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
         return None
 
 def main():

@@ -1,0 +1,21 @@
+﻿{
+  "dark_factory": {
+    "version": "1.0.0",
+    "status": "operational",
+    "features": {
+      "content_generation": true,
+      "youtube_upload": false,
+      "automated_scheduling": true,
+      "credential_embedded": true
+    },
+    "schedule": "every_6_hours",
+    "next_phases": [
+      "Fix Gemini API quota",
+      "Implement real YouTube upload",
+      "Add thumbnail generation",
+      "Multi-channel support",
+      "Analytics dashboard"
+    ],
+    "generated_on": "$(Get-Date -Format 'yyyy-MM-dd')"
+  }
+}

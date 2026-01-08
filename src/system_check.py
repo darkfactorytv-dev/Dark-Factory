@@ -2,26 +2,46 @@
 """
 Dark Factory - System Check
 Validates all dependencies and credentials
+Uses NEW google-genai SDK
 """
 import os
 import json
 import sys
-import google.genai as genai
+import google.genai  # NEW SDK
 
 def check_gemini():
-    """Check Gemini API credentials"""
-    print("🔍 Checking Gemini API...")
+    """Check Gemini API credentials with NEW SDK"""
+    print("🔍 Checking Gemini API (new SDK)...")
     
     api_key = os.getenv("GEMINI_API_KEY")
+    
+    # Fallback to embedded credentials
     if not api_key:
-        print("❌ GEMINI_API_KEY not set")
+        try:
+            from darker_factory import decode_credentials
+            api_key, _ = decode_credentials()
+        except:
+            api_key = ""
+    
+    if not api_key:
+        print("❌ GEMINI_API_KEY not found")
         return False
     
     try:
-        genai.configure(api_key=api_key)
-        # Simple test - list models
-        models = genai.list_models()
-        print(f"✅ Gemini API: OK ({len(list(models))} models available)")
+        # NEW API: Create client
+        client = google.genai.Client(api_key=api_key)
+        
+        # Test by listing models
+        models = list(client.models.list())
+        print(f"✅ Gemini API: OK ({len(models)} models available)")
+        
+        # Show available models
+        print("   Available models:")
+        for model in models[:3]:  # Show first 3
+            print(f"     - {model.name}")
+        if len(models) > 3:
+            print(f"     ... and {len(models)-3} more")
+            
         return True
     except Exception as e:
         print(f"❌ Gemini API error: {e}")
@@ -32,8 +52,17 @@ def check_youtube():
     print("🔍 Checking YouTube credentials...")
     
     creds_json = os.getenv("YOUTUBE_CREDENTIALS")
+    
+    # Fallback to embedded credentials
     if not creds_json:
-        print("❌ YOUTUBE_CREDENTIALS not set")
+        try:
+            from darker_factory import decode_credentials
+            _, creds_json = decode_credentials()
+        except:
+            creds_json = ""
+    
+    if not creds_json:
+        print("❌ YOUTUBE_CREDENTIALS not found")
         return False
     
     try:
@@ -48,7 +77,7 @@ def check_youtube():
         missing = [field for field in required if field not in installed]
         
         if missing:
-            print(f"❌ Missing fields: {missing}")
+            print(f"❌ Missing required fields: {missing}")
             return False
         
         print(f"✅ YouTube credentials: OK")
@@ -69,11 +98,16 @@ def check_python():
     print(f"✅ Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
     
     # Check required packages
-    required = ["google-generativeai", "google-auth-oauthlib", "google-api-python-client"]
+    required = ["google-genai", "google-auth-oauthlib", "google-api-python-client"]
     
     for package in required:
         try:
-            __import__(package.replace("-", "_"))
+            if package == "google-genai":
+                __import__("google.genai")
+            elif package == "google-auth-oauthlib":
+                __import__("google_auth_oauthlib")
+            elif package == "google-api-python-client":
+                __import__("googleapiclient")
             print(f"✅ {package}: OK")
         except ImportError:
             print(f"❌ {package}: Missing")
@@ -82,7 +116,7 @@ def check_python():
     return True
 
 def main():
-    print("🏭 DARK FACTORY - SYSTEM CHECK")
+    print("🏭 DARK FACTORY - SYSTEM CHECK (NEW SDK)")
     print("=" * 50)
     
     checks = [
