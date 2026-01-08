@@ -3,3 +3,7 @@
 *.wav filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
 *.jpg filter=lfs diff=lfs merge=lfs -text
+# Force GitHub to treat YAML files correctly
+*.yml text eol=lf
+*.yaml text eol=lf
+.github/workflows/* linguist-detectable=true
