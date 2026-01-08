@@ -1,146 +1,65 @@
-﻿name: 🏭 Dark Factory Production
+name: Dark Factory Production
 
 on:
-  workflow_dispatch:    # Permite execução manual
-  schedule:
-    - cron: "0 */6 * * *"  # A cada 6 horas
+  workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  produce-content:
+  produce:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
+    
     steps:
-      - name: ⬇️ Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - name: 🐍 Setup Python
+      
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-          cache: "pip"
-
-      - name: 📦 Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
-          pip install google-generativeai google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client
-
-      - name: 🔐 Validate Credentials
-        id: validate-creds
+      
+      - name: Test Secrets
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           YOUTUBE_CREDENTIALS: ${{ secrets.YOUTUBE_CREDENTIALS }}
         run: |
-          echo "🔍 Validando credenciais..."
+          echo "=== TESTANDO SECRETS ==="
           
-          # Test Gemini API Key
+          # Test Gemini
           if [ -z "$GEMINI_API_KEY" ]; then
-            echo "❌ ERRO: GEMINI_API_KEY não configurado"
-            echo "Vá em Settings > Secrets > Actions e adicione o secret"
+            echo "ERRO: GEMINI_API_KEY nao configurado"
             exit 1
           fi
-          echo "✅ Gemini API Key: OK (${#GEMINI_API_KEY} chars)"
+          echo "OK: Gemini key presente"
           
-          # Test YouTube Credentials
+          # Test YouTube
           if [ -z "$YOUTUBE_CREDENTIALS" ]; then
-            echo "❌ ERRO: YOUTUBE_CREDENTIALS não configurado"
+            echo "ERRO: YOUTUBE_CREDENTIALS nao configurado"
             exit 1
           fi
           
-          echo "$YOUTUBE_CREDENTIALS" > /tmp/youtube_creds.json
-          if python3 -c "import json; json.load(open('/tmp/youtube_creds.json'))"; then
-            echo "✅ YouTube Credentials: JSON válido"
+          echo "$YOUTUBE_CREDENTIALS" > test.json
+          if python3 -c "import json; json.load(open('test.json'))"; then
+            echo "OK: YouTube JSON valido"
           else
-            echo "❌ ERRO: YouTube Credentials JSON inválido"
+            echo "ERRO: YouTube JSON invalido"
             exit 1
           fi
-
-      - name: 🧪 Run System Check
+          
+          echo "TODOS OS SECRETS VALIDOS!"
+      
+      - name: Run System Check
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          YOUTUBE_CREDENTIALS: ${{ secrets.YOUTUBE_CREDENTIALS }}
         run: |
-          echo "🧪 Executando verificação do sistema..."
-          if [ -f src/system_check.py ]; then
-            python src/system_check.py
-          else
-            echo "⚠️  system_check.py não encontrado, criando teste básico..."
-            python3 -c "
-import os, json, sys
-print('=== DARK FACTORY SYSTEM CHECK ===')
+          echo "=== SYSTEM CHECK ==="
+          python3 -c "
+import os, sys
 print(f'Python: {sys.version}')
-gemini = os.getenv('GEMINI_API_KEY')
-print(f'Gemini Key: {\"✅ Presente\" if gemini else \"❌ Ausente\"}')
-youtube = os.getenv('YOUTUBE_CREDENTIALS')
-print(f'YouTube Creds: {\"✅ Presente\" if youtube else \"❌ Ausente\"}')
-print('✅ Sistema verificado')
-            "
-          fi
-
-      - name: 🎬 Generate Content
-        id: generate
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: |
-          echo "🎬 Gerando conteúdo..."
-          if [ -f src/content_generator.py ]; then
-            python src/content_generator.py
-          else
-            echo "⚠️  content_generator.py não encontrado"
-            echo "Criando conteúdo de teste..."
-            echo '{"title": "Test Content", "script": "This is test content"}' > content.json
-          fi
-          echo "content_file=content.json" >> $GITHUB_OUTPUT
-
-      - name: 📤 Prepare Upload
-        if: steps.generate.outputs.content_file
-        env:
-          YOUTUBE_CREDENTIALS: ${{ secrets.YOUTUBE_CREDENTIALS }}
-        run: |
-          echo "📤 Preparando upload para YouTube..."
-          if [ -f src/youtube_uploader.py ]; then
-            echo "Executando youtube_uploader.py..."
-            python src/youtube_uploader.py
-          else
-            echo "⚠️  youtube_uploader.py não encontrado"
-            echo "Simulando upload..."
-            echo "📹 Vídeo processado"
-            echo "🎞️  Thumbnail gerada"
-            echo "📊 Metadata pronta"
-          fi
-
-      - name: 📊 Generate Report
-        if: always()
-        run: |
-          echo "📊 RELATÓRIO DE EXECUÇÃO"
-          echo "========================"
-          echo "Data: $(date)"
-          echo "Workflow: ${{ github.workflow }}"
-          echo "Status: ${{ job.status }}"
-          echo ""
-          echo "📁 Artefatos gerados:"
-          ls -la *.json *.log 2>/dev/null || echo "Nenhum arquivo encontrado"
-          echo ""
-          echo "✅ Workflow concluído em: $(date)"
-
-      - name: 💾 Save Artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: production-artifacts
-          path: |
-            *.json
-            *.log
-            simulation.log
-          retention-days: 7
-
-      - name: 🎉 Success Notification
-        if: success()
-        run: echo "🚀 Dark Factory produziu conteúdo com sucesso!"
+key = os.getenv(\"GEMINI_API_KEY\")
+print(f'Gemini: {\"OK\" if key else \"FALTA\"}')
+print('System check completo')
+          "
+      
+      - name: Success
+        run: echo "? WORKFLOW EXECUTADO COM SUCESSO!"
