@@ -1,0 +1,58 @@
+name: Test Secrets
+on: [workflow_dispatch]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Create Test Script
+        run: |
+          cat > test_json.py << "EOF"
+import json, sys
+print("Testing YouTube JSON...")
+try:
+    with open("creds.json") as f:
+        data = json.load(f)
+    print("SUCCESS: JSON valid")
+    if "installed" in data:
+        cid = data["installed"].get("client_id", "")
+        print(f"Client ID: {cid[:20]}...")
+except Exception as e:
+    print(f"ERROR: {e}")
+    sys.exit(1)
+EOF
+          echo "Test script created"
+      
+      - name: Test Gemini
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          echo "Testing GEMINI_API_KEY..."
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "ERROR: Missing GEMINI_API_KEY"
+            exit 1
+          fi
+          echo "SUCCESS: Gemini key exists"
+      
+      - name: Test YouTube
+        env:
+          YOUTUBE_CREDENTIALS: ${{ secrets.YOUTUBE_CREDENTIALS }}
+        run: |
+          echo "Testing YOUTUBE_CREDENTIALS..."
+          if [ -z "$YOUTUBE_CREDENTIALS" ]; then
+            echo "ERROR: Missing YOUTUBE_CREDENTIALS"
+            exit 1
+          fi
+          
+          # Save credentials
+          echo "$YOUTUBE_CREDENTIALS" > creds.json
+          echo "File created: creds.json"
+          
+          # Run test
+          python3 test_json.py
+      
+      - name: Success
+        run: echo "? All tests passed!"
