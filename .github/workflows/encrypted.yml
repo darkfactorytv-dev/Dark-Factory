@@ -1,0 +1,20 @@
+﻿name: 🔐 Dark Factory Encrypted
+on: [workflow_dispatch]
+
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Decrypt credentials
+        run: |
+          # As credenciais estarão em um arquivo no repositório
+          # criptografado com git-crypt ou similar
+          echo "Usando arquivo local de credenciais"
+          cat config/credentials.encrypted | base64 --decode > credentials.json
+      
+      - name: Produzir
+        run: |
+          python src/system_check.py

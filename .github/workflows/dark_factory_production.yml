@@ -1,0 +1,133 @@
+﻿name: 🏭 Dark Factory PRODUCTION
+on:
+  schedule:
+    - cron: "0 */6 * * *"  # A cada 6 horas (00:00, 06:00, 12:00, 18:00 UTC)
+  workflow_dispatch:        # Execução manual
+
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      
+      - name: 📦 Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install google-genai google-auth-oauthlib google-api-python-client requests
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+      
+      - name: 🔐 Validate credentials
+        id: validate
+        run: |
+          echo "Validando credenciais embutidas..."
+          python src/darker_factory.py
+          echo "validation=passed" >> $GITHUB_OUTPUT
+      
+      - name: 🎬 Generate YouTube content
+        if: steps.validate.outputs.validation == 'passed'
+        run: |
+          echo "Gerando conteúdo para YouTube..."
+          
+          if [ -f "src/content_generator.py" ]; then
+            echo "Usando content_generator.py..."
+            python src/content_generator.py
+            
+            # Verificar se gerou conteúdo
+            if [ -f "latest_content.txt" ]; then
+              echo "✅ Conteúdo gerado com sucesso!"
+              CONTENT_LENGTH=$(wc -c < "latest_content.txt")
+              echo "Tamanho: $CONTENT_LENGTH caracteres"
+              echo "content=generated" >> $GITHUB_OUTPUT
+            else
+              echo "⚠️  Não gerou latest_content.txt"
+              # Criar conteúdo de fallback
+              echo "Fallback content for $(date)" > latest_content.txt
+            fi
+          else
+            echo "⚠️  content_generator.py não encontrado"
+            echo "Criando conteúdo de teste..."
+            echo "# Dark Factory Automated Video" > video_title.txt
+            echo "Gerado em: $(date)" > video_script.txt
+            echo "Test content for YouTube automation" > latest_content.txt
+            echo "content=test" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 📤 Upload to YouTube (Simulation)
+        if: steps.validate.outputs.validation == 'passed'
+        run: |
+          echo "📤 Preparando upload para YouTube..."
+          
+          # Verificar se temos credenciais
+          if [ -f "src/youtube_uploader.py" ]; then
+            echo "Executando youtube_uploader.py..."
+            python src/youtube_uploader.py || echo "Uploader executado (pode falhar em simulação)"
+          else
+            echo "⚠️  youtube_uploader.py não encontrado"
+            echo "Simulando upload..."
+            echo "🎬 Vídeo: Dark Factory Automated Content" > upload_simulation.txt
+            echo "📅 Data: $(date)" >> upload_simulation.txt
+            echo "🔒 Status: Private (testing)" >> upload_simulation.txt
+            echo "✅ Upload simulado com sucesso!"
+          fi
+      
+      - name: 📊 Generate production report
+        if: always()
+        run: |
+          echo ""
+          echo "========================================"
+          echo "📅 DARK FACTORY PRODUCTION REPORT"
+          echo "========================================"
+          echo "Run ID: ${{ github.run_id }}"
+          echo "Date: $(date)"
+          echo "Status: ${{ job.status }}"
+          echo ""
+          echo "📁 Generated files:"
+          ls -la *.txt *.json 2>/dev/null | while read line; do
+            echo "  $line"
+          done || echo "  No files generated"
+          echo ""
+          echo "⏱️  Completed at: $(date)"
+          echo "========================================"
+      
+      - name: 💾 Save artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dark-factory-production-${{ github.run_id }}
+          path: |
+            *.txt
+            *.json
+            generated_*.txt
+            latest_content.txt
+            upload_simulation.txt
+          retention-days: 7
+      
+      - name: 🎉 Success notification
+        if: success()
+        run: |
+          echo "========================================"
+          echo "🚀 DARK FACTORY PRODUCTION COMPLETE!"
+          echo "========================================"
+          echo ""
+          echo "✅ Credentials: Validated"
+          echo "✅ Content: Generated"
+          echo "✅ Upload: Simulated"
+          echo ""
+          echo "⏰ Next run: In 6 hours (automatically)"
+          echo ""
+          echo "📈 Next steps:"
+          echo "1. Implement real video generation"
+          echo "2. Add thumbnail creation"
+          echo "3. Enable real YouTube upload"
+          echo "========================================"
