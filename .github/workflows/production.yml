@@ -76,8 +76,10 @@ jobs:
 import os, json, sys
 print('=== DARK FACTORY SYSTEM CHECK ===')
 print(f'Python: {sys.version}')
-print(f'Gemini Key: {'✅ Presente' if os.getenv(\"GEMINI_API_KEY\") else '❌ Ausente'}')
-print(f'YouTube Creds: {'✅ Presente' if os.getenv(\"YOUTUBE_CREDENTIALS\") else '❌ Ausente'}')
+gemini = os.getenv('GEMINI_API_KEY')
+print(f'Gemini Key: {\"✅ Presente\" if gemini else \"❌ Ausente\"}')
+youtube = os.getenv('YOUTUBE_CREDENTIALS')
+print(f'YouTube Creds: {\"✅ Presente\" if youtube else \"❌ Ausente\"}')
 print('✅ Sistema verificado')
             "
           fi
