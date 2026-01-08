@@ -1,0 +1,102 @@
+name: Dark Factory CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  test-secrets:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    
+    - name: Test Gemini Secret
+      id: test-gemini
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      run: |
+        echo "Testing GEMINI_API_KEY..."
+        if [ -z "$GEMINI_API_KEY" ]; then
+          echo "ERROR: GEMINI_API_KEY is empty"
+          echo "status=failed" >> $GITHUB_OUTPUT
+          exit 1
+        else
+          echo "SUCCESS: Gemini key length: ${#GEMINI_API_KEY}"
+          echo "status=success" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Test YouTube Secret
+      id: test-youtube
+      env:
+        YOUTUBE_CREDENTIALS: ${{ secrets.YOUTUBE_CREDENTIALS }}
+      run: |
+        echo "Testing YOUTUBE_CREDENTIALS..."
+        if [ -z "$YOUTUBE_CREDENTIALS" ]; then
+          echo "ERROR: YOUTUBE_CREDENTIALS is empty"
+          echo "status=failed" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+        # Write to file and test JSON
+        echo "$YOUTUBE_CREDENTIALS" > /tmp/creds.json
+        if python3 -c "import json; json.load(open('/tmp/creds.json'))"; then
+          echo "SUCCESS: YouTube JSON is valid"
+          echo "status=success" >> $GITHUB_OUTPUT
+        else
+          echo "ERROR: YouTube JSON is invalid"
+          echo "status=failed" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+    
+    - name: Run Python Scripts
+      if: steps.test-gemini.outputs.status == 'success' && steps.test-youtube.outputs.status == 'success'
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        YOUTUBE_CREDENTIALS: ${{ secrets.YOUTUBE_CREDENTIALS }}
+      run: |
+        echo "Running Python scripts..."
+        
+        # Test if scripts exist
+        if [ -f "src/system_check.py" ]; then
+          echo "Running system_check.py..."
+          python src/system_check.py
+        else
+          echo "Creating minimal test script..."
+          cat > test_apis.py << 'EOF'
+import os, json, sys
+
+print("=== DARK FACTORY API TEST ===")
+print()
+
+# Test Gemini
+gemini = os.getenv("GEMINI_API_KEY")
+print(f"Gemini API: {'OK' if gemini else 'MISSING'}")
+
+# Test YouTube
+yt = os.getenv("YOUTUBE_CREDENTIALS")
+if yt:
+    try:
+        data = json.loads(yt)
+        print(f"YouTube API: OK (client: {data.get('installed',{}).get('client_id','?')[:20]}...)")
+    except:
+        print("YouTube API: INVALID JSON")
+else:
+    print("YouTube API: MISSING")
+
+print()
+print("All tests completed")
+EOF
+          python test_apis.py
+        fi
+    
+    - name: Success
+      if: success()
+      run: echo "WORKFLOW COMPLETED SUCCESSFULLY"
