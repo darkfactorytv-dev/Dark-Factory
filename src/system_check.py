@@ -6,7 +6,7 @@ Validates all dependencies and credentials
 import os
 import json
 import sys
-import google.generativeai as genai
+import google.genai as genai
 
 def check_gemini():
     """Check Gemini API credentials"""

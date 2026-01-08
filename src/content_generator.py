@@ -5,7 +5,7 @@ Uses Gemini API to generate YouTube content
 """
 import os
 import json
-import google.generativeai as genai
+import google.genai as genai
 from datetime import datetime
 
 def generate_with_gemini(prompt, api_key):

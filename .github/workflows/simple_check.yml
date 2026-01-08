@@ -1,0 +1,40 @@
+﻿name: 🧪 Teste Simples
+on: [workflow_dispatch]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Teste 1 - Apenas verificar
+        id: check-secrets
+        env:
+          GEMINI: ${{ secrets.GEMINI_API_KEY }}
+          YOUTUBE: ${{ secrets.YOUTUBE_CREDENTIALS }}
+        run: |
+          echo "GEMINI_API_KEY está vazio? $([ -z "$GEMINI" ] && echo "SIM" || echo "NÃO")"
+          echo "YOUTUBE_CREDENTIALS está vazio? $([ -z "$YOUTUBE" ] && echo "SIM" || echo "NÃO")"
+          
+          # Salvar status
+          if [ -n "$GEMINI" ]; then
+            echo "gemini=present" >> $GITHUB_OUTPUT
+          else
+            echo "gemini=missing" >> $GITHUB_OUTPUT
+          fi
+          
+          if [ -n "$YOUTUBE" ]; then
+            echo "youtube=present" >> $GITHUB_OUTPUT
+          else
+            echo "youtube=missing" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Resultado
+        run: |
+          echo "RESULTADO:"
+          echo "Gemini: ${{ steps.check-secrets.outputs.gemini }}"
+          echo "YouTube: ${{ steps.check-secrets.outputs.youtube }}"
+          
+          if [ "${{ steps.check-secrets.outputs.gemini }}" = "present" ] && [ "${{ steps.check-secrets.outputs.youtube }}" = "present" ]; then
+            echo "🎉 TODOS OS SECRETS ESTÃO CONFIGURADOS!"
+          else
+            echo "⚠️  ALGUM SECRET ESTÁ FALTANDO"
+          fi
