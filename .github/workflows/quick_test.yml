@@ -1,0 +1,43 @@
+﻿name: 🧪 Dark Factory QUICK TEST
+on: [workflow_dispatch]
+
+jobs:
+  quick-test:
+    name: Quick System Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Python Info
+        run: |
+          echo "Python: $(python --version)"
+          echo "Pip: $(pip --version)"
+      
+      - name: 🔧 Core Test
+        run: |
+          echo "🔧 Testing Dark Factory core..."
+          echo ""
+          echo "1. Testing credential system:"
+          python src/darker_factory.py
+          echo ""
+          echo "2. Testing content generation:"
+          python src/simple_generator.py
+          echo ""
+          echo "3. Listing project structure:"
+          find . -name "*.py" -type f | head -10
+          echo ""
+          echo "✅ QUICK TEST COMPLETED"
+      
+      - name: 📊 Test Report
+        run: |
+          echo "========================================"
+          echo "🧪 DARK FACTORY - QUICK TEST REPORT"
+          echo "========================================"
+          echo "Date: $(date)"
+          echo "Run: ${{ github.run_number }}"
+          echo ""
+          echo "✅ Test sequence completed"
+          echo "📁 Check artifacts for generated files"
+          echo "========================================"
