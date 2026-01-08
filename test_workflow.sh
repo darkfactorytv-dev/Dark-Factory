@@ -1,0 +1,13 @@
+﻿#!/bin/bash
+echo "🧪 Testando novo workflow..."
+echo "1. Validando YAML..."
+python3 -c "import yaml; yaml.safe_load(open('.github/workflows/production.yml'))" && echo "✅ YAML válido"
+echo ""
+echo "2. Credenciais necessárias:"
+echo "   - GEMINI_API_KEY"
+echo "   - YOUTUBE_CREDENTIALS"
+echo ""
+echo "3. Para testar localmente:"
+echo "   export GEMINI_API_KEY='sua_chave'"
+echo "   export YOUTUBE_CREDENTIALS='seu_json'"
+echo "   python src/system_check.py"
