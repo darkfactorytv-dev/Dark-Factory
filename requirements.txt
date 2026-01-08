@@ -1,8 +1,24 @@
-﻿# Dependências do Dark Factory
+﻿# 🏭 DARK FACTORY - PRODUCTION DEPENDENCIES
+
+# Google APIs
 google-generativeai>=0.3.0
 google-api-python-client>=2.100.0
+google-auth-oauthlib>=1.0.0
+google-auth-httplib2>=0.1.0
+
+# Video/Audio Processing
 moviepy>=1.0.3
 pillow>=10.0.0
 edge-tts>=6.1.0
+pydub>=0.25.1
+
+# Utilities
 python-dotenv>=1.0.0
 requests>=2.31.0
+pydantic>=2.0.0
+colorama>=0.4.6
+tqdm>=4.66.0
+
+# Data & JSON
+pandas>=2.0.0
+numpy>=1.24.0

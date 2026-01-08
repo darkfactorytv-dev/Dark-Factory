@@ -1,0 +1,32 @@
+﻿{
+  "categorias": {
+    "escritorio": ["clipe", "caneta", "post-it", "grampeador", "furador"],
+    "cozinha": ["microondas", "liquidificador", "fogão", "geladeira"],
+    "tecnologia": ["mouse", "teclado", "monitor", "roteador"],
+    "vestuario": ["ziper", "botao", "cadarco", "velcro"]
+  },
+  "temas_detalhados": [
+    {
+      "id": "DF-OBJ-001",
+      "nome": "clipe de papel",
+      "categoria": "escritorio",
+      "dificuldade": "baixa",
+      "pesquisa": "clipe história invenção",
+      "fatos_pre_definidos": [
+        "Inventado em 1899 por Johann Vaaler",
+        "Existem 55 tipos diferentes de clipes",
+        "Foi símbolo de resistência na Segunda Guerra",
+        "O design atual é praticamente o mesmo há 100 anos"
+      ],
+      "produtos_afiliados": [
+        {
+          "nome": "Clipe Colorido 100un",
+          "tipo": "amazon",
+          "categoria": "Escritório",
+          "keywords": "clipe papel escritório organização"
+        }
+      ],
+      "tags": ["escritório", "organização", "história", "inovação"]
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "project": "Dark Factory",
+  "version": "1.0",
+  "total_themes": 3,
+  "themes": [
+    {
+      "id": "DF-OBJ-001",
+      "name": "clipe de papel",
+      "category": "office",
+      "difficulty": "easy",
+      "facts": [
+        "Inventado em 1899 por Johann Vaaler",
+        "Existem 55 tipos diferentes de clipes",
+        "Foi símbolo de resistência na Segunda Guerra"
+      ]
+    },
+    {
+      "id": "DF-OBJ-002",
+      "name": "caneta BIC",
+      "category": "office",
+      "difficulty": "easy",
+      "facts": [
+        "Vende 57 unidades por segundo mundialmente",
+        "Pode escrever por 3km contínuos",
+        "A tampa tem furo por segurança"
+      ]
+    },
+    {
+      "id": "DF-OBJ-003",
+      "name": "Post-it",
+      "category": "office",
+      "difficulty": "medium",
+      "facts": [
+        "Inventado por acidente em 1968",
+        "O adesivo inicial não funcionava bem",
+        "A cor amarela foi escolhida por acaso"
+      ]
+    }
+  ]
+}
