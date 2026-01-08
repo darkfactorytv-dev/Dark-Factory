@@ -1,0 +1,104 @@
+name: Dark Factory Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    
+    - name: Test Secrets
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        YOUTUBE_CREDENTIALS: ${{ secrets.YOUTUBE_CREDENTIALS }}
+      run: |
+        echo "=== TESTING SECRETS ==="
+        
+        # Test Gemini
+        if [ -z "$GEMINI_API_KEY" ]; then
+          echo "ERROR: GEMINI_API_KEY is not set"
+          echo "Go to: Settings > Secrets > Actions"
+          exit 1
+        fi
+        echo "OK: Gemini key exists (length: ${#GEMINI_API_KEY})"
+        
+        # Test YouTube
+        if [ -z "$YOUTUBE_CREDENTIALS" ]; then
+          echo "ERROR: YOUTUBE_CREDENTIALS is not set"
+          exit 1
+        fi
+        
+        # Test JSON validity
+        echo "$YOUTUBE_CREDENTIALS" > /tmp/test.json
+        if python3 -c "import json; json.load(open('/tmp/test.json'))"; then
+          echo "OK: YouTube JSON is valid"
+        else
+          echo "ERROR: YouTube JSON is invalid"
+          exit 1
+        fi
+        
+        echo "ALL SECRETS ARE VALID!"
+    
+    - name: Create Test Script
+      run: |
+        cat > test_simple.py << "PYEOF"
+import os, json, sys
+
+print("DARK FACTORY TEST")
+print("=" * 50)
+
+# Get environment variables
+gemini = os.getenv("GEMINI_API_KEY")
+youtube = os.getenv("YOUTUBE_CREDENTIALS")
+
+print(f"Python version: {sys.version[:20]}...")
+print()
+print(f"GEMINI_API_KEY: {'PRESENT' if gemini else 'MISSING'}")
+if gemini:
+    print(f"  Length: {len(gemini)} chars")
+    print(f"  Starts with: {gemini[:15]}...")
+
+print()
+print(f"YOUTUBE_CREDENTIALS: {'PRESENT' if youtube else 'MISSING'}")
+if youtube:
+    try:
+        data = json.loads(youtube)
+        client_id = data.get('installed', {}).get('client_id', 'unknown')
+        print(f"  Client ID: {client_id[:30]}...")
+        print(f"  JSON: Valid")
+    except Exception as e:
+        print(f"  ERROR: {type(e).__name__}: {e}")
+
+print()
+print("=" * 50)
+print("Test completed")
+PYEOF
+    
+    - name: Run Test Script
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        YOUTUBE_CREDENTIALS: ${{ secrets.YOUTUBE_CREDENTIALS }}
+      run: |
+        python test_simple.py
+    
+    - name: Check Existing Scripts
+      run: |
+        echo "Checking project structure..."
+        echo ""
+        echo "Python files in src/:"
+        find src -name "*.py" 2>/dev/null || echo "No src directory"
+        echo ""
+        echo "Requirements file:"
+        ls -la requirements.txt 2>/dev/null || echo "No requirements.txt"
+    
+    - name: Success
+      run: echo "WORKFLOW COMPLETED SUCCESSFULLY"
