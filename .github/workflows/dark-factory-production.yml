@@ -1,6 +1,6 @@
-﻿name: 🏭 Dark Factory Production
+name: Dark Factory Production
 on:
-  workflow_dispatch:        # Execução manual
+  workflow_dispatch:        # Execu��o manual
   push:
     branches: [main]        # Executa ao fazer push
   schedule:
@@ -10,48 +10,48 @@ jobs:
   produce:
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout repository
+      - name: ?? Checkout repository
         uses: actions/checkout@v4
         
-      - name: 🐍 Setup Python 3.11
+      - name: ?? Setup Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           
-      - name: 📦 Install dependencies
+      - name: ?? Install dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
           pip install google-genai google-api-python-client google-auth-httplib2 google-auth-oauthlib
           
-      - name: 🔍 Verify project structure
+      - name: ?? Verify project structure
         run: |
-          echo "📁 Project Structure:"
+          echo "?? Project Structure:"
           find . -name "*.py" -type f | head -15
           
-      - name: 🎬 Generate Content (Gemini AI)
+      - name: ?? Generate Content (Gemini AI)
         id: generate
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: |
-          echo "🚀 Starting content generation..."
-          python src/content_generator.py || echo "⚠️ Generator failed or not found"
+          echo "?? Starting content generation..."
+          python src/content_generator.py || echo "?? Generator failed or not found"
           
-      - name: 📤 Upload to YouTube
+      - name: ?? Upload to YouTube
         id: upload
         env:
           YOUTUBE_CREDENTIALS_JSON: ${{ secrets.YOUTUBE_CREDENTIALS }}
         run: |
-          echo "📤 Starting YouTube upload..."
-          python src/youtube_uploader.py || echo "⚠️ Uploader failed or not found"
+          echo "?? Starting YouTube upload..."
+          python src/youtube_uploader.py || echo "?? Uploader failed or not found"
           
-      - name: 📊 Production Report
+      - name: ?? Production Report
         if: always()
         run: |
           echo "========================================"
-          echo "🏭 DARK FACTORY PRODUCTION REPORT"
+          echo "?? DARK FACTORY PRODUCTION REPORT"
           echo "========================================"
-          echo "📅 Date: $(date)"
-          echo "✅ Generate: ${{ steps.generate.outcome }}"
-          echo "✅ Upload: ${{ steps.upload.outcome }}"
+          echo "?? Date: $(date)"
+          echo "? Generate: ${{ steps.generate.outcome }}"
+          echo "? Upload: ${{ steps.upload.outcome }}"
           echo "========================================"
