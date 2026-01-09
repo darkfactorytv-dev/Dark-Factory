@@ -62,7 +62,7 @@ def generate_youtube_script():
         
         # NEW API: Generate content
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             contents=prompt
         )
         script = response.text
@@ -70,7 +70,7 @@ def generate_youtube_script():
         # Generate title separately
         title_prompt = f"Generate a catchy YouTube title for a video about: {selected_topic}"
         title_response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             contents=title_prompt
         )
         title = title_response.text.strip().replace('"', '')
@@ -104,7 +104,7 @@ def generate_youtube_script():
             "topic": selected_topic,
             "generated_at": datetime.now().isoformat(),
             "script_length": len(script),
-            "model": "gemini-2.0-flash"
+            "model": "gemini-2.5-flash"
         }
         
         with open(f"metadata_{timestamp}.json", "w", encoding="utf-8") as f:
@@ -143,3 +143,5 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
