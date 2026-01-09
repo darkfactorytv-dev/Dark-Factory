@@ -1,57 +1,36 @@
-name: Dark Factory Production
+ï»¿name: Dark Factory Production
 on:
-  workflow_dispatch:        # Execução manual
+  workflow_dispatch:
   push:
-    branches: [main]        # Executa ao fazer push
+    branches: [main]
   schedule:
-    - cron: "0 12 * * *"    # Executa DIARIAMENTE ao meio-dia UTC
+    - cron: "0 12 * * *"
 
 jobs:
   produce:
     runs-on: ubuntu-latest
     steps:
-      - name: ?? Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         
-      - name: ?? Setup Python 3.11
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           
-      - name: ?? Install dependencies
+      - name: Install dependencies
         run: |
-          pip install --upgrade pip
           pip install -r requirements.txt
-          pip install google-genai google-api-python-client google-auth-httplib2 google-auth-oauthlib
+          pip install google-genai google-api-python-client
           
-      - name: ?? Verify project structure
-        run: |
-          echo "?? Project Structure:"
-          find . -name "*.py" -type f | head -15
-          
-      - name: ?? Generate Content (Gemini AI)
-        id: generate
+      - name: Run Dark Factory
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          YOUTUBE_CREDENTIALS: ${{ secrets.YOUTUBE_CREDENTIALS }}
         run: |
-          echo "?? Starting content generation..."
-          python src/content_generator.py || echo "?? Generator failed or not found"
+          echo "Starting Dark Factory..."
+          python src/content_generator.py
+          python src/youtube_uploader.py
           
-      - name: ?? Upload to YouTube
-        id: upload
-        env:
-          YOUTUBE_CREDENTIALS_JSON: ${{ secrets.YOUTUBE_CREDENTIALS }}
-        run: |
-          echo "?? Starting YouTube upload..."
-          python src/youtube_uploader.py || echo "?? Uploader failed or not found"
-          
-      - name: ?? Production Report
-        if: always()
-        run: |
-          echo "========================================"
-          echo "?? DARK FACTORY PRODUCTION REPORT"
-          echo "========================================"
-          echo "?? Date: $(date)"
-          echo "? Generate: ${{ steps.generate.outcome }}"
-          echo "? Upload: ${{ steps.upload.outcome }}"
-          echo "========================================"
+      - name: Complete
+        run: echo "Dark Factory completed"
