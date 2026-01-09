@@ -1,0 +1,22 @@
+﻿name: Dark Factory Pipeline
+on: [push, workflow_dispatch]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Start
+        run: echo "🏭 Dark Factory Starting..."
+        
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Test
+        run: |
+          echo "Testing system..."
+          ls -la
+          echo "Python files:"
+          find . -name "*.py" | head -5
+          
+      - name: Complete
+        run: echo "✅ Dark Factory Test Complete"
