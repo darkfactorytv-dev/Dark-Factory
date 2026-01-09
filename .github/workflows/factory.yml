@@ -1,9 +1,0 @@
-name: DARK-FACTORY
-on: [push, workflow_dispatch]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Dark Factory is running!"
-      - run: echo "Success at $(date)"
