@@ -34,3 +34,20 @@ secrets/
 credentials.json
 temp/
 
+
+# Arquivos de ambiente
+.env.local
+.env
+
+# Backup de configurações
+*.backup
+*.bak
+
+# Arquivos temporários de produção
+productions/temp/*
+productions/audio/*.wav
+productions/audio/*.mp3
+productions/video/*.mp4
+
+# Logs de sistema
+logs/system/*.log

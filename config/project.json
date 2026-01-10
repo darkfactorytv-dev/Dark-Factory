@@ -1,21 +1,52 @@
 ﻿{
-  "dark_factory": {
-    "version": "1.0.0",
-    "status": "operational",
-    "features": {
-      "content_generation": true,
-      "youtube_upload": false,
-      "automated_scheduling": true,
-      "credential_embedded": true
-    },
-    "schedule": "every_6_hours",
-    "next_phases": [
-      "Fix Gemini API quota",
-      "Implement real YouTube upload",
-      "Add thumbnail generation",
-      "Multi-channel support",
-      "Analytics dashboard"
-    ],
-    "generated_on": "$(Get-Date -Format 'yyyy-MM-dd')"
-  }
+    "project":  {
+                    "name":  "Dark Factory",
+                    "version":  "2.0",
+                    "mode":  "audio_visual_production",
+                    "status":  "active"
+                },
+    "apis":  {
+                 "gemini":  {
+                                "model":  "gemini-2.5-flash",
+                                "api_key_env":  "GOOGLE_API_KEY",
+                                "enabled":  true
+                            },
+                 "suno":  {
+                              "enabled":  true,
+                              "api_key_env":  "SUNO_API_KEY",
+                              "base_url":  "https://api.sunoapi.org/api/v1",
+                              "default_duration":  600,
+                              "default_tags":  [
+                                                   "dark ambient",
+                                                   "factory sounds",
+                                                   "industrial"
+                                               ]
+                          },
+                 "stable_audio":  {
+                                      "enabled":  true,
+                                      "api_key_env":  "STABLE_AUDIO_API_KEY",
+                                      "base_url":  "https://api.stability.ai/v2alpha/audio",
+                                      "default_duration":  600
+                                  },
+                 "youtube":  {
+                                 "enabled":  false,
+                                 "credentials_file":  "config/google_api.json",
+                                 "privacy":  "private"
+                             }
+             },
+    "workflow":  {
+                     "schedule":  "0 12 * * *",
+                     "trigger":  [
+                                     "workflow_dispatch",
+                                     "schedule"
+                                 ],
+                     "max_duration":  600
+                 },
+    "features":  {
+                     "content_generation":  true,
+                     "audio_generation":  true,
+                     "video_composition":  true,
+                     "youtube_upload":  false,
+                     "automated_scheduling":  true
+                 }
 }
