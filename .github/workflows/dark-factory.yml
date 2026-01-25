@@ -2,7 +2,7 @@ name: Dark Factory - Daily Curator
 
 on:
   schedule:
-    - cron: '0 7 * * *'  # 7h UTC todo dia (4h BRT)
+    - cron: '0 7 * * *'  # 07:00 UTC daily (4h BRT)
   workflow_dispatch:  # Permite execução manual
 
 jobs:
